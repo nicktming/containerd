@@ -52,8 +52,11 @@ func (s *imageStore) Get(ctx context.Context, name string) (images.Image, error)
 		return images.Image{}, err
 	}
 
+	fmt.Printf("===>images namespace:%v\n", namespace)
+
 	if err := view(ctx, s.db, func(tx *bolt.Tx) error {
 		bkt := getImagesBucket(tx, namespace)
+		fmt.Printf("===>images bkt:%v\n", bkt)
 		if bkt == nil {
 			return errors.Wrapf(errdefs.ErrNotFound, "image %q", name)
 		}
