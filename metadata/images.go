@@ -47,6 +47,8 @@ func NewImageStore(db *DB) images.Store {
 func (s *imageStore) Get(ctx context.Context, name string) (images.Image, error) {
 	var image images.Image
 
+	fmt.Printf("===>images name:%v\n", name)
+
 	namespace, err := namespaces.NamespaceRequired(ctx)
 	if err != nil {
 		return images.Image{}, err
