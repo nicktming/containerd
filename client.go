@@ -86,9 +86,11 @@ func New(address string, opts ...ClientOpt) (*Client, error) {
 		copts.timeout = 10 * time.Second
 	}
 	rt := fmt.Sprintf("%s.%s", plugin.RuntimePlugin, runtime.GOOS)
+	fmt.Printf("rt:%s, defaultRuntime:%v\n", rt, copts.defaultRuntime)
 	if copts.defaultRuntime != "" {
 		rt = copts.defaultRuntime
 	}
+	fmt.Printf("rt:%s\n", rt)
 	c := &Client{
 		runtime: rt,
 	}
