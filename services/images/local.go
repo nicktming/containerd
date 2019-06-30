@@ -18,6 +18,7 @@ package images
 
 import (
 	"context"
+	"fmt"
 
 	eventstypes "github.com/containerd/containerd/api/events"
 	imagesapi "github.com/containerd/containerd/api/services/images/v1"
@@ -99,6 +100,8 @@ func (l *local) List(ctx context.Context, req *imagesapi.ListImagesRequest, _ ..
 
 func (l *local) Create(ctx context.Context, req *imagesapi.CreateImageRequest, _ ...grpc.CallOption) (*imagesapi.CreateImageResponse, error) {
 	log.G(ctx).WithField("name", req.Image.Name).WithField("target", req.Image.Target.Digest).Debugf("create image")
+	fmt.Printf("===>local Create ctx:%v, req:%v\n", ctx, req)
+
 	if req.Image.Name == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "Image.Name required")
 	}
