@@ -18,6 +18,7 @@ package docker
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"sort"
 	"strings"
@@ -47,6 +48,7 @@ type tokenScopesKey struct{}
 // contextWithRepositoryScope returns a context with tokenScopesKey{} and the repository scope value.
 func contextWithRepositoryScope(ctx context.Context, refspec reference.Spec, push bool) (context.Context, error) {
 	s, err := repositoryScope(refspec, push)
+	fmt.Printf("===>scope contextWithRepositoryScope s:%v\n", s)
 	if err != nil {
 		return nil, err
 	}

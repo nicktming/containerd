@@ -18,6 +18,7 @@ package docker
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/url"
 	"path"
@@ -138,7 +139,9 @@ func NewResolver(options ResolverOptions) remotes.Resolver {
 var _ remotes.Resolver = &dockerResolver{}
 
 func (r *dockerResolver) Resolve(ctx context.Context, ref string) (string, ocispec.Descriptor, error) {
+	fmt.Printf("===> Resolve ref:%s\n", ref)
 	refspec, err := reference.Parse(ref)
+	fmt.Printf("===> Resolve refspec:%v\n", refspec)
 	if err != nil {
 		return "", ocispec.Descriptor{}, err
 	}
@@ -148,6 +151,7 @@ func (r *dockerResolver) Resolve(ctx context.Context, ref string) (string, ocisp
 	}
 
 	base, err := r.base(refspec)
+	fmt.Printf("===> Resolve base:%v\n", base)
 	if err != nil {
 		return "", ocispec.Descriptor{}, err
 	}
@@ -160,6 +164,8 @@ func (r *dockerResolver) Resolve(ctx context.Context, ref string) (string, ocisp
 		urls []string
 		dgst = refspec.Digest()
 	)
+
+	fmt.Printf("===> Resolve dgst:%v\n", dgst)
 
 	if dgst != "" {
 		if err := dgst.Validate(); err != nil {
@@ -177,6 +183,7 @@ func (r *dockerResolver) Resolve(ctx context.Context, ref string) (string, ocisp
 		urls = append(urls, fetcher.url("manifests", refspec.Object))
 	}
 
+	fmt.Printf("===> Resolve urls:%v\n", urls)
 	ctx, err = contextWithRepositoryScope(ctx, refspec, false)
 	if err != nil {
 		return "", ocispec.Descriptor{}, err
@@ -246,6 +253,8 @@ func (r *dockerResolver) Resolve(ctx context.Context, ref string) (string, ocisp
 			MediaType: resp.Header.Get("Content-Type"), // need to strip disposition?
 			Size:      size,
 		}
+
+		fmt.Printf("===> digest:%v, mediaType:%v, size:%v\n", desc.Digest, desc.MediaType, desc.Size)
 
 		log.G(ctx).WithField("desc.digest", desc.Digest).Debug("resolved")
 		return ref, desc, nil
