@@ -40,7 +40,6 @@ import (
 	"github.com/containerd/containerd/content"
 	contentproxy "github.com/containerd/containerd/content/proxy"
 	"github.com/containerd/containerd/defaults"
-	"github.com/containerd/containerd/errdefs"
 	"github.com/containerd/containerd/events"
 	"github.com/containerd/containerd/images"
 	"github.com/containerd/containerd/leases"
@@ -57,7 +56,7 @@ import (
 	"github.com/containerd/typeurl"
 	ptypes "github.com/gogo/protobuf/types"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
-	specs "github.com/opencontainers/runtime-spec/specs-go"
+	"github.com/opencontainers/runtime-spec/specs-go"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health/grpc_health_v1"
@@ -391,17 +390,21 @@ func (c *Client) Pull(ctx context.Context, ref string, opts ...RemoteOpt) (Image
 }
 
 func (c *Client) fetch(ctx context.Context, rCtx *RemoteContext, ref string, limit int) (images.Image, error) {
+	fmt.Printf("===>client fetch 111\n")
 	store := c.ContentStore()
 	name, desc, err := rCtx.Resolver.Resolve(ctx, ref)
+	fmt.Printf("===>client fetch 222\n")
 	if err != nil {
 		return images.Image{}, errors.Wrapf(err, "failed to resolve reference %q", ref)
 	}
 
+	fmt.Printf("===>client fetch 333\n")
 	fetcher, err := rCtx.Resolver.Fetcher(ctx, name)
 	if err != nil {
 		return images.Image{}, errors.Wrapf(err, "failed to get fetcher for %q", name)
 	}
 
+	fmt.Printf("===>client fetch 444\n")
 	var (
 		handler images.Handler
 
@@ -452,46 +455,50 @@ func (c *Client) fetch(ctx context.Context, rCtx *RemoteContext, ref string, lim
 			return docker.ConvertManifest(ctx, store, desc)
 		}
 	}
+	fmt.Printf("===>client fetch 555\n")
 
 	if err := images.Dispatch(ctx, handler, desc); err != nil {
 		return images.Image{}, err
 	}
-
+	fmt.Printf("===>client fetch 666\n")
 	if isConvertible {
 		if desc, err = converterFunc(ctx, desc); err != nil {
 			return images.Image{}, err
 		}
 	}
 
+	fmt.Printf("===>client fetch 777\n")
 	img := images.Image{
 		Name:   name,
 		Target: desc,
 		Labels: rCtx.Labels,
 	}
 
-	is := c.ImageService()
-	for {
-		if created, err := is.Create(ctx, img); err != nil {
-			if !errdefs.IsAlreadyExists(err) {
-				return images.Image{}, err
-			}
+	return img, nil
 
-			updated, err := is.Update(ctx, img)
-			if err != nil {
-				// if image was removed, try create again
-				if errdefs.IsNotFound(err) {
-					continue
-				}
-				return images.Image{}, err
-			}
-
-			img = updated
-		} else {
-			img = created
-		}
-
-		return img, nil
-	}
+	//is := c.ImageService()
+	//for {
+	//	if created, err := is.Create(ctx, img); err != nil {
+	//		if !errdefs.IsAlreadyExists(err) {
+	//			return images.Image{}, err
+	//		}
+	//
+	//		updated, err := is.Update(ctx, img)
+	//		if err != nil {
+	//			// if image was removed, try create again
+	//			if errdefs.IsNotFound(err) {
+	//				continue
+	//			}
+	//			return images.Image{}, err
+	//		}
+	//
+	//		img = updated
+	//	} else {
+	//		img = created
+	//	}
+	//
+	//	return img, nil
+	//}
 }
 
 // Push uploads the provided content to a remote resource
