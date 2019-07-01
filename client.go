@@ -393,13 +393,14 @@ func (c *Client) fetch(ctx context.Context, rCtx *RemoteContext, ref string, lim
 	fmt.Printf("===>client fetch 111\n")
 	store := c.ContentStore()
 	name, desc, err := rCtx.Resolver.Resolve(ctx, ref)
-	fmt.Printf("===>client fetch 222\n")
+	fmt.Printf("===>client fetch 222 ===>name:%s, desc:%v\n", name, desc)
 	if err != nil {
 		return images.Image{}, errors.Wrapf(err, "failed to resolve reference %q", ref)
 	}
 
 	fmt.Printf("===>client fetch 333\n")
 	fetcher, err := rCtx.Resolver.Fetcher(ctx, name)
+	fmt.Printf("===>client fetch 333 ===> fetcher:%v\n", fetcher)
 	if err != nil {
 		return images.Image{}, errors.Wrapf(err, "failed to get fetcher for %q", name)
 	}
