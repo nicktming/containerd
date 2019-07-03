@@ -390,22 +390,17 @@ func (c *Client) Pull(ctx context.Context, ref string, opts ...RemoteOpt) (Image
 }
 
 func (c *Client) fetch(ctx context.Context, rCtx *RemoteContext, ref string, limit int) (images.Image, error) {
-	fmt.Printf("===>client fetch 111\n")
 	store := c.ContentStore()
 	name, desc, err := rCtx.Resolver.Resolve(ctx, ref)
-	fmt.Printf("===>client fetch 222 ===>name:%s, desc:%v\n", name, desc)
 	if err != nil {
 		return images.Image{}, errors.Wrapf(err, "failed to resolve reference %q", ref)
 	}
 
-	fmt.Printf("===>client fetch 333\n")
 	fetcher, err := rCtx.Resolver.Fetcher(ctx, name)
-	fmt.Printf("===>client fetch 333 ===> fetcher:%v\n", fetcher)
 	if err != nil {
 		return images.Image{}, errors.Wrapf(err, "failed to get fetcher for %q", name)
 	}
 
-	fmt.Printf("===>client fetch 444\n")
 	var (
 		handler images.Handler
 
@@ -456,19 +451,17 @@ func (c *Client) fetch(ctx context.Context, rCtx *RemoteContext, ref string, lim
 			return docker.ConvertManifest(ctx, store, desc)
 		}
 	}
-	fmt.Printf("===>client fetch 555\n")
 
 	if err := images.Dispatch(ctx, handler, desc); err != nil {
 		return images.Image{}, err
 	}
-	fmt.Printf("===>client fetch 666\n")
+
 	if isConvertible {
 		if desc, err = converterFunc(ctx, desc); err != nil {
 			return images.Image{}, err
 		}
 	}
 
-	fmt.Printf("===>client fetch 777\n")
 	img := images.Image{
 		Name:   name,
 		Target: desc,
