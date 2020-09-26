@@ -4,3 +4,5 @@ coverage.txt
 profile.out
 containerd.test
 _site/
+.idea/
+
